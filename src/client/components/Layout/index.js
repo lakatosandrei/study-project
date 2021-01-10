@@ -17,7 +17,7 @@ const Child = ({
   title,
   children,
   className = '',
-  showSidebar = true,
+  showSidebar = false,
   location: { pathname },
   global: { theme, accessToken, user },
   updateThemeAction,
@@ -47,7 +47,7 @@ const Child = ({
               <Collapse isOpen={!collapsed} navbar className='d-lg-block'>
                 <div className='sidebar__title__container'>
                   <Link to='/' className='sidebar__title mr-auto'>
-                    <h1>KBlog</h1>
+                    <h1>Acasa</h1>
                   </Link>
 
                   <Switch
@@ -71,13 +71,8 @@ const Child = ({
                   />
                 </div>
 
-                <p>
-                  Sharing experiences, knowledge, and case studies help people
-                  create more professional applications and products.
-                </p>
-
                 <div className='sidebar__section'>
-                  <h5>Account</h5>
+                  <h5>Link-uri utile</h5>
 
                   {!accessToken && (
                     <>
@@ -88,13 +83,19 @@ const Child = ({
                           </Link>
                         </li>
 
+                      </ul>
+                    </>
+                  )}
+
+                  {!accessToken && (
+                    <>
+                      <ul className='nav flex-column'>
                         <li className='nav-item'>
-                          <Link
-                            className='nav-link sidebar__item'
-                            to='/register'>
-                            Register
+                          <Link className='nav-link sidebar__item' to='/jobs'>
+                            Posturi
                           </Link>
                         </li>
+
                       </ul>
                     </>
                   )}
@@ -133,65 +134,6 @@ const Child = ({
                   )}
                 </div>
 
-                <div className='sidebar__section'>
-                  <h5>Menu</h5>
-
-                  <ul className='nav flex-column'>
-                    <li className='nav-item'>
-                      <NavLink
-                        className='nav-link sidebar__item'
-                        to='/'
-                        isActive={(_, { pathname: path }) => {
-                          return path.match(/^\/$/) || path.match(/^\/p\//);
-                        }}>
-                        Posts
-                      </NavLink>
-                    </li>
-                    {/* <li className='nav-item'>
-                    <NavLink className='nav-link sidebar__item' to='/questions'>
-                      Questions
-                    </NavLink>
-                  </li> */}
-                    <li className='nav-item'>
-                      <NavLink
-                        className='nav-link sidebar__item'
-                        to='/introduce'>
-                        Introduce
-                      </NavLink>
-                    </li>
-                    <li className='nav-item'>
-                      <NavLink className='nav-link sidebar__item' to='/contact'>
-                        Contact
-                      </NavLink>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className='sidebar__section'>
-                  <h5>Links</h5>
-
-                  <ul className='list-group list-group-horizontal'>
-                    <a href='https://github.com/htdangkhoa' target='_'>
-                      <li className='list-group-item p-0 rounded-circle sidebar__link'>
-                        <i className='fab fa-github-alt'></i>
-                      </li>
-                    </a>
-
-                    <a
-                      href='https://www.linkedin.com/in/khoa-đăng-7575a6136'
-                      target='_'>
-                      <li className='list-group-item p-0 rounded-circle sidebar__link'>
-                        <i className='fab fa-linkedin'></i>
-                      </li>
-                    </a>
-
-                    <a href='mailto:huynhtran.dangkhoa@gmail.com' target='_'>
-                      <li className='list-group-item p-0 rounded-circle sidebar__link'>
-                        <i className='far fa-envelope'></i>
-                      </li>
-                    </a>
-                  </ul>
-                </div>
               </Collapse>
             </div>
           )}

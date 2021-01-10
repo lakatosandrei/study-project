@@ -1,6 +1,6 @@
 /* @flow */
 import { type Request, type Response } from 'express';
-import { genSaltSync, hashSync, compareSync } from 'bcrypt';
+import { compareSync } from 'bcrypt';
 import head from 'lodash/head';
 import {
   badRequest,
@@ -9,9 +9,7 @@ import {
   unauthorized,
 } from 'models/result.model';
 import { sign, verify, TYPE_ACCESS, TYPE_REFRESH } from '../../secure/jwt';
-
-const hashPassword = (password: string): string =>
-  hashSync(password, genSaltSync());
+import { hashPassword } from '../../mongo/helper';
 
 const generateToken = (userId: string) => ({
   accessToken: sign({ _id: userId, type: TYPE_ACCESS }),

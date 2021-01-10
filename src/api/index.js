@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import auth from './auth';
 import generic from './generic';
-import post from './post';
+import job from './job';
 import comment from './comment';
 
 const router = Router();
 
 router.use('/auth', auth);
 
-router.use('/post', post);
+router.use('/job', job);
 
 router.use('/comment', comment);
 

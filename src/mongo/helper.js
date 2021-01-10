@@ -1,6 +1,10 @@
 /* @flow */
 import { type MongoPagingType, type MongoPagingResultType } from 'types';
 import head from 'lodash/head';
+import { genSaltSync, hashSync } from 'bcrypt';
+
+export const hashPassword = (password: string): string =>
+  hashSync(password, genSaltSync());
 
 export const usePaging = async ({
   collection,
@@ -34,7 +38,7 @@ export const usePaging = async ({
 
   const result = head(list);
 
-  const { count = 0 } = result?.total;
+  const { count = 0 } = result?.total || {};
 
   const total = Math.ceil(count / roundLimit);
 
@@ -47,4 +51,19 @@ export const usePaging = async ({
     values: result?.data || [],
     metaData,
   };
+};
+
+export const createInitialDbValues = async (usersCollection) => {
+  const userAdmin = await usersCollection.findOne({ email: 'admin@admin.com' });
+
+  if (!userAdmin) {
+    await usersCollection.insertOne(
+      {
+        email: 'admin@admin.com',
+        password: hashPassword('admin'),
+      },
+      { serializeFunctions: true },
+    );
+  }
+
 };

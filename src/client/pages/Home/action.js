@@ -1,22 +1,38 @@
-/* @flow */
-import { type Dispatch } from 'redux';
-import { type ApiDataType } from 'types';
+import { toast } from 'react-toastify';
 import { actionGenerator } from 'utils';
 import { requestAction } from 'utils/request';
+import { updateTokenAction } from 'store/action';
 
-export const GET_POSTS = actionGenerator('@@GET_POSTS');
-
-export const getPostsAction = (skip?: number = 0) => (dispatch: Dispatch) =>
+export const LOGIN_ACTION = actionGenerator('@@LOGIN_ACTION');
+export const loginAction = (data) => (dispatch) =>
   dispatch(
     requestAction({
-      url: '/post/newest',
-      label: GET_POSTS.NAME,
-      params: { skip },
-      onSuccess: ({ data }: ApiDataType) => {
-        dispatch({ type: GET_POSTS.SUCCESS, payload: data });
+      url: '/auth/login',
+      label: LOGIN_ACTION.NAME,
+      method: 'POST',
+      data,
+      onSuccess: ({ data: res }) => {
+        dispatch(updateTokenAction({ ...res }));
       },
-      onError: ({ error }: ApiDataType) => {
-        dispatch({ type: GET_POSTS.ERROR, payload: error });
+      onError: ({ error }) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
+export const JOIN_ACTION = actionGenerator('@@JOIN_ACTION');
+export const joinAction = (data) => (dispatch) =>
+  dispatch(
+    requestAction({
+      url: '/auth/login',
+      label: LOGIN_ACTION.NAME,
+      method: 'POST',
+      data,
+      onSuccess: ({ data: res }) => {
+        dispatch(updateTokenAction({ ...res }));
+      },
+      onError: ({ error }) => {
+        toast.error(error.message);
       },
     }),
   );

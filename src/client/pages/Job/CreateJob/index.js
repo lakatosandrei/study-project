@@ -13,11 +13,11 @@ import * as action from './action';
 
 import './styles.scss';
 
-const CreatePost = ({
+const CreateJob = ({
   route: { title },
-  createPost: { post, error },
-  createPostAction,
-  deleteLocalPostAction,
+  createJob: { job, error },
+  createJobAction,
+  deleteLocalJobAction,
 }) => {
   useEffect(() => {
     if (error) {
@@ -25,13 +25,13 @@ const CreatePost = ({
     }
 
     return () => {
-      deleteLocalPostAction();
+      deleteLocalJobAction();
     };
   }, [error]);
 
-  const [titlePost, setTitlePost] = useState('');
+  const [titleJob, setTitleJob] = useState('');
 
-  const onTitlePostChange = ({ target: { value } }) => setTitlePost(value);
+  const onTitleJobChange = ({ target: { value } }) => setTitleJob(value);
 
   const [description, setDescription] = useState('');
 
@@ -58,25 +58,25 @@ const CreatePost = ({
   };
 
   const onPublish = () => {
-    createPostAction({
-      title: titlePost,
+    createJobAction({
+      title: titleJob,
       description,
       tags: tags.join(','),
       content: source,
     });
   };
 
-  if (post) {
+  if (job) {
     return <Redirect to='/' />;
   }
 
   return (
-    <Layout title={title} needLogin className='create__post__container'>
+    <Layout title={title} needLogin className='create__job__container'>
       <input
         className='form-control'
         placeholder='Title'
-        value={titlePost}
-        onChange={onTitlePostChange}
+        value={titleJob}
+        onChange={onTitleJobChange}
       />
 
       <input
@@ -89,7 +89,7 @@ const CreatePost = ({
       <TagsInput
         className='tags__group'
         inputClassName='tags__input'
-        placeholder='Tag your post. Maximum 5 tags. At least 1 tag!'
+        placeholder='Tag your job. Maximum 5 tags. At least 1 tag!'
         value={tags}
         onChange={onTagsInputChange}
         tagComponent={(tag, i) => (
@@ -132,14 +132,14 @@ const CreatePost = ({
   );
 };
 
-const mapStateToProps = ({ global, postReducer: { createPost } }) => ({
+const mapStateToProps = ({ global, jobReducer: { createJob } }) => ({
   global,
-  createPost,
+  createJob,
 });
 
 const mapDispatchToProps = {
-  createPostAction: action.createPostAction,
-  deleteLocalPostAction: action.deleteLocalPostAction,
+  createJobAction: action.createJobAction,
+  deleteLocalJobAction: action.deleteLocalJobAction,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreatePost);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateJob);

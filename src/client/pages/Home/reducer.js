@@ -1,36 +1,25 @@
 /* @flow */
-import { combineReducers } from 'redux';
 import { type ActionType } from 'types';
-import { GET_POSTS } from './action';
-import postDetail from './PostDetail/reducer';
-import createPost from './CreatePost/reducer';
+import { LOGIN_ACTION } from './action';
 
 const initialState = {
-  posts: [],
-  metaData: {
-    index: 0,
-    total: 0,
-  },
+  data: null,
   error: null,
 };
 
-const post = (state: any = initialState, action: ActionType) => {
+export default (state: any = initialState, action: ActionType) => {
   switch (action.type) {
-    case GET_POSTS.SUCCESS: {
-      const { posts, metaData } = action.payload;
+    case LOGIN_ACTION.SUCCESS: {
+      const { data } = action.payload;
 
-      return {
-        ...state,
-        posts: [...posts],
-        metaData: { ...metaData },
-      };
+      return { ...state, ...data };
     }
-    case GET_POSTS.ERROR: {
-      return { ...state, error: action.payload };
+    case LOGIN_ACTION.ERROR: {
+      const { error } = action.payload;
+
+      return { ...state, error };
     }
     default:
       return { ...state };
   }
 };
-
-export default combineReducers({ post, postDetail, createPost });

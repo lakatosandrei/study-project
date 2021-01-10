@@ -4,7 +4,6 @@ import { ObjectId } from 'mongodb';
 import { usePaging } from 'mongo/helper';
 import { resultModel, genericError, badRequest } from 'models/result.model';
 import head from 'lodash/head';
-import compact from 'lodash/compact';
 
 const aggregateLookupUser = [
   {
@@ -21,78 +20,50 @@ const aggregateLookupUser = [
   { $unwind: '$user' },
 ];
 
-export const getPostsController = () => async (req: Request, res: Response) => {
+export const getJobsController = () => async (req: Request, res: Response) => {
   const {
-    postsCollection,
+    jobsCollection,
     query: { skip = 0 },
   } = req;
 
   try {
-    const { values: posts, metaData } = await usePaging({
-      collection: postsCollection,
+    const { values: jobs, metaData } = await usePaging({
+      collection: jobsCollection,
       aggregate: [...aggregateLookupUser, { $sort: { publishAt: -1 } }],
       skip,
     });
 
     return res.json(
       resultModel({
-        data: { posts, metaData },
+        data: { jobs, metaData },
       }),
     );
   } catch (error) {
+    console.log('LOGARE', error);
     return res.json(genericError({ message: error.message }));
   }
 };
 
-export const getPostDetailController = () => async (
+export const createJobController = () => async (
   req: Request,
   res: Response,
 ) => {
   const {
-    params: { _id },
-    postsCollection,
-  } = req;
-
-  if (!_id || !ObjectId.isValid(_id)) {
-    return res.json(badRequest());
-  }
-
-  try {
-    const posts = await postsCollection
-      .aggregate([{ $match: { _id: ObjectId(_id) } }, ...aggregateLookupUser])
-      .toArray();
-
-    return res.json(resultModel({ data: head(posts) }));
-  } catch (error) {
-    return res.json(genericError({ message: error.message }));
-  }
-};
-
-export const createPostController = () => async (
-  req: Request,
-  res: Response,
-) => {
-  const {
-    body: { title, description, content, tags = '' },
+    body: { title, description },
     user,
-    postsCollection,
+    jobsCollection,
   } = req;
 
-  const listTag = compact(tags.split(',').map((tag) => tag.trim()));
-
-  if (!title || !description || !content || listTag.length === 0) {
+  if (!title || !description) {
     return res.json(badRequest());
   }
 
   try {
-    const { ops } = await postsCollection.insertOne(
+    const { ops } = await jobsCollection.insertOne(
       {
         title,
         description,
-        content,
-        tags: listTag,
-        comments: [],
-        viewers: [],
+        cvs: [],
         publishAt: new Date(),
         user_id: user._id,
       },
@@ -100,6 +71,30 @@ export const createPostController = () => async (
     );
 
     return res.json(resultModel({ data: head(ops) }));
+  } catch (error) {
+    return res.json(genericError({ message: error.message }));
+  }
+};
+
+export const deleteJobController = () => async (
+  req: Request,
+  res: Response,
+) => {
+  const {
+    params: { _id },
+    jobsCollection,
+  } = req;
+
+  if (!_id || !ObjectId.isValid(_id)) {
+    return res.json(badRequest());
+  }
+
+  try {
+    const removedJob = await jobsCollection.remove({
+      _id: ObjectId(_id),
+    });
+
+    return res.json(resultModel({ data: removedJob }));
   } catch (error) {
     return res.json(genericError({ message: error.message }));
   }

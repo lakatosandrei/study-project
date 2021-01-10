@@ -1,8 +1,8 @@
 /* @flow */
-const site = (link: string, display?: string = 'Site') =>
+const site = (link: string, display: string = 'Site') =>
   `<a href="${link}" target="_blank">${display}</a>`;
 
-const download = (link: string, display?: string = 'Download') =>
+const download = (link: string, display: string = 'Download') =>
   site(link, display);
 
 export const profile = `

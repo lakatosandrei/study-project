@@ -1,6 +1,7 @@
 /* @flow */
 import { MongoClient } from 'mongodb';
 import { type MongoConnectionType, type MongoResultType } from 'types';
+import { createInitialDbValues } from './helper';
 
 const useMongo = ({
   host,
@@ -14,14 +15,16 @@ const useMongo = ({
     useUnifiedTopology: true,
     auth: !user || !password ? null : { user, password },
   })
-    .then((client) => {
+    .then(async (client) => {
       const db = client.db(database);
 
       const usersCollection = db.collection('users');
 
-      const postsCollection = db.collection('posts');
+      const jobsCollection = db.collection('jobs');
 
-      const commentsCollection = db.collection('comments');
+      const cvsCollection = db.collection('cvs');
+
+      await createInitialDbValues(usersCollection);
 
       const result: MongoResultType = {
         client,
@@ -34,8 +37,8 @@ const useMongo = ({
         Object.assign(request, {
           ...result,
           usersCollection,
-          postsCollection,
-          commentsCollection,
+          jobsCollection,
+          cvsCollection,
         });
       }
 

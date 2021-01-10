@@ -1,14 +1,17 @@
 import Login from 'pages/Login';
 import Register from 'pages/Register';
 import Post from 'pages/Post';
+import Job from 'pages/Job';
 import Home from 'pages/Home';
 import { getPostsAction } from 'pages/Post/action';
+import { getJobsAction } from 'pages/Job/action';
 import PostDetail from 'pages/Post/PostDetail';
 import {
   getPostDetailAction,
   getCommentsAction,
 } from 'pages/Post/PostDetail/action';
 import CreatePost from 'pages/Post/CreatePost';
+import CreateJob from 'pages/Job/CreateJob';
 import Introduce from 'pages/Introduce';
 import Projects from 'pages/Introduce/Projects';
 import Contact from 'pages/Contact';
@@ -24,6 +27,25 @@ export default [
         exact: true,
         component: Home,
         title: 'Home'
+      },
+      {
+        path: '/jobs',
+        exact: true,
+        component: Job,
+        title: 'Job',
+        loadData: ({ _params }) => [getJobsAction()],
+      },
+      {
+        path: '/job/:_id',
+        component: PostDetail,
+        loadData: ({ params: { _id } }) => [
+          getCvsForJobAction(_id)
+        ],
+      },
+      {
+        path: '/create-job',
+        component: CreateJob,
+        title: 'Create job',
       },
       {
         path: '/posts',

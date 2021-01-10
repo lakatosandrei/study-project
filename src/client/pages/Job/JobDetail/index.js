@@ -13,11 +13,11 @@ import { formatDate } from 'utils';
 import * as action from './action';
 import '../styles.scss';
 
-const PostDetail = ({
+const JobDetail = ({
   match: { params },
   global: { accessToken },
   postDetail: { post, comments, error },
-  getPostDetailAction,
+  getJobDetailAction,
   getCommentsAction,
   postCommentAction,
 }) => {
@@ -25,7 +25,7 @@ const PostDetail = ({
 
   useEffect(() => {
     if (post?._id !== _id) {
-      getPostDetailAction(_id);
+      getJobDetailAction(_id);
     }
 
     if (comments?.length === 0 || post?._id !== _id) {
@@ -141,9 +141,7 @@ const mapStateToProps = ({ global, postReducer: { postDetail } }) => ({
 });
 
 const mapDispatchToProps = {
-  getPostDetailAction: action.getPostDetailAction,
-  getCommentsAction: action.getCommentsAction,
-  postCommentAction: action.postCommentAction,
+  getJobDetailAction: action.getJobDetailAction
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(PostDetail);
+export default connect(mapStateToProps, mapDispatchToProps)(JobDetail);
