@@ -18,7 +18,7 @@ let Home = ({ history, handleSubmit, joinAction, route: { title }, global: { acc
   }
 
   return (
-    <Layout title={title} returnPath='/' showSidebar={true}>
+    <Layout title={title} returnPath='/'>
 
       <button className='login-button' onClick={() => history.push('/login')}>
         Login

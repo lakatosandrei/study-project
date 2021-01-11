@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 import { type ActionType } from 'types';
 import { GET_JOBS } from './action';
 import createJob from './CreateJob/reducer';
+import jobDetail from './JobDetail/reducer';
 
 const initialState = {
   jobs: [],
@@ -32,4 +33,4 @@ const job = (state: any = initialState, action: ActionType) => {
   }
 };
 
-export default combineReducers({ job, createJob });
+export default combineReducers({ job, jobDetail, createJob });

@@ -17,7 +17,7 @@ const Child = ({
   title,
   children,
   className = '',
-  showSidebar = false,
+  showSidebar = true,
   location: { pathname },
   global: { theme, accessToken, user },
   updateThemeAction,
@@ -108,14 +108,6 @@ const Child = ({
                             className='nav-link sidebar__item'
                             to='/profile'>
                             {user?.name}
-                          </NavLink>
-                        </li>
-
-                        <li className='nav-item'>
-                          <NavLink
-                            className='nav-link sidebar__item'
-                            to='/create-post'>
-                            Create post
                           </NavLink>
                         </li>
 

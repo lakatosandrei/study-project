@@ -25,7 +25,7 @@ const converter = new Converter({
 converter.setFlavor('github');
 
 const parseEmojis = (value) => {
-  const emojisArray = toArray(value);
+  const emojisArray = toArray(value || '');
 
   const newValue = emojisArray.reduce((previous, current) => {
     if (typeof current === 'string') {

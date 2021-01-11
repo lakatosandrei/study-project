@@ -10,8 +10,12 @@ import {
   getPostDetailAction,
   getCommentsAction,
 } from 'pages/Post/PostDetail/action';
+import {
+  getCvsForJobAction, getJobDetailAction,
+} from 'pages/Job/JobDetail/action';
 import CreatePost from 'pages/Post/CreatePost';
 import CreateJob from 'pages/Job/CreateJob';
+import JobDetail from 'pages/Job/JobDetail';
 import Introduce from 'pages/Introduce';
 import Projects from 'pages/Introduce/Projects';
 import Contact from 'pages/Contact';
@@ -37,8 +41,9 @@ export default [
       },
       {
         path: '/job/:_id',
-        component: PostDetail,
+        component: JobDetail,
         loadData: ({ params: { _id } }) => [
+          getJobDetailAction(_id),
           getCvsForJobAction(_id)
         ],
       },

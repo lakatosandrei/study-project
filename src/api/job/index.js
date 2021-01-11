@@ -2,12 +2,15 @@ import { Router } from 'express';
 import {
   getJobsController,
   createJobController,
-  deleteJobController
+  deleteJobController,
+  getJobDetailController
 } from './controller';
 
 const router = Router();
 
 router.all('/newest', getJobsController());
+
+router.get('/detail/:_id', getJobDetailController());
 
 router.post('/create-job', createJobController());
 

@@ -6,7 +6,7 @@ import { requestAction } from 'utils/request';
 
 export const GET_POSTS = actionGenerator('@@GET_POSTS');
 
-export const getPostsAction = (skip?: number = 0) => (dispatch: Dispatch) =>
+export const getPostsAction = (skip: number = 0) => (dispatch: Dispatch) =>
   dispatch(
     requestAction({
       url: '/post/newest',

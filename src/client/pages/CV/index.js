@@ -13,22 +13,17 @@ import { formatDate } from 'utils';
 import * as action from './action';
 import '../styles.scss';
 
-const JobDetail = ({
+const CV = ({
   match: { params },
   global: { accessToken },
-  jobDetail: { job, cvs, error },
-  getJobDetailAction,
-  getCvsForJobAction
+  cvDetail: { age, gender, maritalStatus, error },
+  getCVAction
 }) => {
   const { _id } = params;
 
   useEffect(() => {
     if (job?._id !== _id) {
-      getJobDetailAction(_id);
-    }
-
-    if (cvs?.length === 0 || job?._id !== _id) {
-      getCvsForJobAction(_id);
+      getCVAction(_id);
     }
 
     if (error) {
@@ -124,14 +119,13 @@ const JobDetail = ({
   );
 };
 
-const mapStateToProps = ({ global, jobReducer: { jobDetail } }) => ({
+const mapStateToProps = ({ global, jobReducer: { CV } }) => ({
   global,
-  jobDetail,
+  cv,
 });
 
 const mapDispatchToProps = {
-  getJobDetailAction: action.getJobDetailAction,
-  getCvsForJobAction: action.getCvsForJobAction
+  getCVAction: action.getCVAction
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(JobDetail);
+export default connect(mapStateToProps, mapDispatchToProps)(CV);

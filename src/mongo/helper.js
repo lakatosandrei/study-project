@@ -9,6 +9,7 @@ export const hashPassword = (password: string): string =>
 export const usePaging = async ({
   collection,
   aggregate = [],
+  fields = null,
   skip = 0,
   limit = 10,
 }: MongoPagingType): MongoPagingResultType => {
@@ -17,23 +18,28 @@ export const usePaging = async ({
   const roundLimit = Math.abs(Math.floor(limit));
 
   const realSkip = roundSkip * roundLimit;
+  const aggregateQuery = [
+    {
+      $facet: {
+        total: [{ $count: 'count' }],
+        data: [
+          ...aggregate,
+          { $skip: realSkip },
+          {
+            $limit: roundLimit,
+          },
+        ],
+      },
+    },
+    { $unwind: '$total' },
+  ];
+
+  if (fields) {
+    aggregateQuery.push(fields);
+  }
 
   const list = await collection
-    .aggregate([
-      {
-        $facet: {
-          total: [{ $count: 'count' }],
-          data: [
-            ...aggregate,
-            { $skip: realSkip },
-            {
-              $limit: roundLimit,
-            },
-          ],
-        },
-      },
-      { $unwind: '$total' },
-    ])
+    .aggregate(aggregateQuery)
     .toArray();
 
   const result = head(list);

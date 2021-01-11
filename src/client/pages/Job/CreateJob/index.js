@@ -37,18 +37,6 @@ const CreateJob = ({
 
   const onDescriptionChange = ({ target: { value } }) => setDescription(value);
 
-  const [tags, setTags] = useState([]);
-
-  const onTagsInputChange = (values) => {
-    if (values.length > 5) {
-      setTags([...tags]);
-
-      return;
-    }
-
-    setTags([...values]);
-  };
-
   const [source, setSource] = useState('');
 
   const [selectedTab, setSelectedTab] = useState('write');
@@ -61,7 +49,6 @@ const CreateJob = ({
     createJobAction({
       title: titleJob,
       description,
-      tags: tags.join(','),
       content: source,
     });
   };
@@ -74,42 +61,21 @@ const CreateJob = ({
     <Layout title={title} needLogin className='create__job__container'>
       <input
         className='form-control'
-        placeholder='Title'
+        placeholder='Titlu'
         value={titleJob}
         onChange={onTitleJobChange}
       />
 
       <input
         className='form-control'
-        placeholder='Description'
+        placeholder='Descriere'
         value={description}
         onChange={onDescriptionChange}
       />
 
-      <TagsInput
-        className='tags__group'
-        inputClassName='tags__input'
-        placeholder='Tag your job. Maximum 5 tags. At least 1 tag!'
-        value={tags}
-        onChange={onTagsInputChange}
-        tagComponent={(tag, i) => (
-          <div key={i} className='tag__item tag__input__item'>
-            <span>{tag}</span>
-
-            <button
-              type='button'
-              className='ml-1 close'
-              aria-label='Close'
-              onClick={() => {
-                tags.splice(i, 1);
-
-                setTags([...tags]);
-              }}>
-              <i className='fas fa-sm fa-times'></i>
-            </button>
-          </div>
-        )}
-      />
+      <label>
+        Cerintele postului
+      </label>
 
       <ReactMde
         selectedTab={selectedTab}

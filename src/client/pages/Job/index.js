@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import Paginate from 'react-paginate';
 
 import Layout from 'components/Layout';
@@ -14,22 +14,16 @@ const Job = ({
   route: { title },
   job: {
     jobs,
-    metaData: { index: page, total },
+    metaData: { total },
   },
   getJobsAction,
 }) => {
   useEffect(() => {
-    if (!jobs || jobs.length === 0) {
-      getJobsAction();
-    }
+    getJobsAction();
   }, []);
 
-  const onPageChange = ({ selected: skip }) => {
-    getJobsAction(skip);
-  };
-
   return (
-    <Layout title={title}>
+    <Layout title={title} needLogin>
       {jobs.map((job) => (
         <div key={job._id} className='job__item'>
           <div>
@@ -39,35 +33,31 @@ const Job = ({
             </code>
           </div>
 
-          <Link to={`/p/${job._id}`} className='job__title'>
+          <Link to={`/job/${job._id}`} className='job__title'>
             <h3>{job.title}</h3>
           </Link>
 
           <p className='job__description'>{job.description}</p>
-
-          <div className='tag__group'>
-            {job.tags.map((tag, i) => (
-              <Link to={`/tags/${tag}`} key={i} className='tag__item'>
-                {tag}
-              </Link>
-            ))}
-          </div>
         </div>
       ))}
 
-      <Paginate
-        pageCount={total}
-        marginPagesDisplayed={3}
-        pageRangeDisplayed={5}
-        initialPage={page}
-        previousLabel={<i className='fa fa-angle-left'></i>}
-        nextLabel={<i className='fa fa-angle-right'></i>}
-        onPageChange={onPageChange}
-        disableInitialCallback
-        containerClassName={'pagination row'}
-        subContainerClassName={'pages pagination'}
-        activeClassName={'active'}
-      />
+      {
+        total === 0 && (
+          <h2>
+            Nu exista un post momentan, te rog adauga unul.
+          </h2>
+        )
+      }
+
+      <div className='row flex-nowrap justify-content-center'>
+        <button className='btn btn-primary btn-block col-6'>
+          <NavLink
+            className='nav-link no-href'
+            to='/create-job'>
+            Adauga
+          </NavLink>
+        </button>
+      </div>
     </Layout>
   );
 };

@@ -12,12 +12,26 @@ const aggregateLookupUser = [
       from: 'users',
       pipeline: [
         { $match: { $expr: { $eq: ['$$user', '$_id'] } } },
-        { $project: { _id: true, name: true } },
+        {
+          $project: {
+            _id: true,
+            name: true,
+          },
+        },
       ],
       as: 'user',
     },
   },
   { $unwind: '$user' },
+];
+
+const aggregateLookupJob = [
+  {
+    $project: {
+      title: true,
+      description: true,
+    },
+  }
 ];
 
 export const getJobsController = () => async (req: Request, res: Response) => {
@@ -29,7 +43,7 @@ export const getJobsController = () => async (req: Request, res: Response) => {
   try {
     const { values: jobs, metaData } = await usePaging({
       collection: jobsCollection,
-      aggregate: [...aggregateLookupUser, { $sort: { publishAt: -1 } }],
+      aggregate: [...aggregateLookupUser, ...aggregateLookupJob, { $sort: { publishAt: -1 } }],
       skip,
     });
 
@@ -44,12 +58,36 @@ export const getJobsController = () => async (req: Request, res: Response) => {
   }
 };
 
+export const getJobDetailController = () => async (
+  req: Request,
+  res: Response,
+) => {
+  const {
+    params: { _id },
+    jobsCollection,
+  } = req;
+
+  if (!_id || !ObjectId.isValid(_id)) {
+    return res.json(badRequest());
+  }
+
+  try {
+    const posts = await jobsCollection
+      .aggregate([{ $match: { _id: ObjectId(_id) } }, ...aggregateLookupUser])
+      .toArray();
+
+    return res.json(resultModel({ data: head(posts) }));
+  } catch (error) {
+    return res.json(genericError({ message: error.message }));
+  }
+};
+
 export const createJobController = () => async (
   req: Request,
   res: Response,
 ) => {
   const {
-    body: { title, description },
+    body: { content, title, description },
     user,
     jobsCollection,
   } = req;
@@ -63,6 +101,7 @@ export const createJobController = () => async (
       {
         title,
         description,
+        content,
         cvs: [],
         publishAt: new Date(),
         user_id: user._id,

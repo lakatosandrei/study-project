@@ -11,7 +11,7 @@ export const createJobAction = (data: Object) => (dispatch: Dispatch) =>
     requestAction({
       url: '/job/create-job',
       label: CREATE_JOB.NAME,
-      method: 'JOB',
+      method: 'POST',
       data,
       onSuccess: ({ data: res }: ApiDataType) => {
         dispatch({ type: CREATE_JOB.SUCCESS, payload: res });
