@@ -4,30 +4,43 @@ import { Link, NavLink } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ReactMde from 'react-mde';
 import moment from 'moment-timezone';
+import { DraggableHandle, SortableItem, SortableList } from 'pages/Cv';
+import arrayMove from 'array-move';
+import throttle from 'lodash/throttle';
 
 import Layout from 'components/Layout';
 import MdViewer, { makeEmojiHtml } from 'components/MdViewer';
-
 import { formatDate } from 'utils';
 
 import * as action from './action';
+import * as cvAction from '../../Cv/action';
 import '../styles.scss';
+import cvReducer from 'pages/Cv/reducer';
+
+const GENDER_MAP = {
+  'male': 'Barbat',
+  'female': 'Femeie'
+};
 
 const JobDetail = ({
   match: { params },
   global: { accessToken },
   jobDetail: { job, cvs, error },
+  loadCvs,
   getJobDetailAction,
-  getCvsForJobAction
+  getCvsForJobAction,
+  deleteCvAction,
+  updateJobAction,
+  updateCvsAction
 }) => {
   const { _id } = params;
 
   useEffect(() => {
-    if (job?._id !== _id) {
+    if (_id) {
       getJobDetailAction(_id);
     }
 
-    if (cvs?.length === 0 || job?._id !== _id) {
+    if (_id) {
       getCvsForJobAction(_id);
     }
 
@@ -36,11 +49,29 @@ const JobDetail = ({
     }
   }, []);
 
+  useEffect(() => {
+    if (loadCvs) {
+      if (_id) {
+        getCvsForJobAction(_id);
+      }
+    }
+  }, [loadCvs]);
+
+  const [titleJob, setTitleJob] = useState('');
+
+  const onTitleJobChange = ({ target: { value } }) => setTitleJob(value);
+
+  const [description, setDescription] = useState('');
+
+  const onDescriptionChange = ({ target: { value } }) => setDescription(value);
+
   const [source, setSource] = useState(job?.content);
 
   useEffect(() => {
     if (job) {
       setSource(job.content);
+      setTitleJob(job.title)
+      setDescription(job.description);
     }
   }, [job]);
 
@@ -50,14 +81,71 @@ const JobDetail = ({
     setSource(value);
   };
 
+  const updateJob = () => {
+    updateJobAction({
+      ...job,
+      description,
+      content: source,
+      title: titleJob,
+    })
+  };
+
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    if (cvs) {
+      setItems(cvs);
+    }
+  }, [cvs]);
+
+  const updateCvs = throttle((newCvs) => {
+    updateCvsAction(newCvs);
+  }, 500, { trailing: true });
+
+  const onSortEnd = ({ oldIndex, newIndex }) => {
+    const cachedOrder = items[oldIndex].order;
+
+    items[oldIndex].order = items[newIndex].order;
+
+    items[newIndex].order = cachedOrder;
+
+    const newCvs = arrayMove(items, oldIndex, newIndex);
+
+    setItems(newCvs);
+    updateCvs(newCvs);
+  };
+
   return (
     <Layout title={job?.title || ''}>
-      <div className='job__item'>
-        <h1 className='job__title'>{job?.title}</h1>
+      <div className='job__item job__item__detail'>
+        <div className='job__item__field'>
+          <label htmlFor='title-job'>
+            Titlu
+          </label>
 
-        <label>
-          <b>{job?.description}</b>
-        </label>
+          <input
+            id='title-job'
+            className='form-control'
+            placeholder='Titlu'
+            value={titleJob}
+            onChange={onTitleJobChange}
+          />
+        </div>
+
+        <div className='job__item__field'>
+          <label htmlFor='description-job'>
+            Descriere
+          </label>
+
+          <input
+            id='description-job'
+            className='form-control'
+            placeholder='Descriere'
+            value={description}
+            onChange={onDescriptionChange}
+          />
+        </div>
+
       </div>
 
       <hr />
@@ -65,16 +153,6 @@ const JobDetail = ({
       {job && (
         <div className='cv__container'>
           <h5>Responsabilitati si sarcini</h5>
-
-          {!accessToken && (
-            <>
-              <div className='card cv__login'>
-                <div className='card-body text-center'>
-                  <Link to='/login'>Login to cv.</Link>
-                </div>
-              </div>
-            </>
-          )}
 
           {accessToken && (
             <>
@@ -92,29 +170,62 @@ const JobDetail = ({
             </>
           )}
 
-          {cvs?.map((cv) => (
-            <div className='card cv__item' key={cv._id}>
-              <div className='card-body'>
-                <div>{cv.user?.name}</div>
+          <h4 className='job__item__detail__cv-list__title'>Lista CV-uri</h4>
 
-                <MdViewer key={cv?._id} source={cv?.cv} />
+          <SortableList
+            useDragHandle
+            className='job__item__detail__cv-list'
+            items={items}
+            onSortEnd={onSortEnd}
+            renderItem={(cv, index) => (
+              <SortableItem key={`cv-item-${index}`} index={index}>
+                <div key={cv._id} className='cv__item'>
+                  <div className='cv__item__buttons'>
+                    <DraggableHandle />
+                    <div className='cv__item__buttons__delete' onClick={() => deleteCvAction(cv._id)}>
+                      <i className='fa fa-trash' />
+                    </div>
+                  </div>
+                  <div className='cv__item__content'>
+                    <div>
+                      {`${formatDate(cv.publishAt)}`}
+                    </div>
 
-                <div>
-                  {moment(cv.createAt || new Date())
-                    .format('MMM DD, YYYY')
-                    .toString()}
+                    <Link to={`/cv/${cv._id}`} className='cv__title'>
+                      <h3>{cv.name}</h3>
+                    </Link>
+
+                    <p className='cv__description'>
+                      <label>
+                        Gen:
+                      </label>
+                      {GENDER_MAP[cv.gender]}
+                    </p>
+
+                    <p className='cv__description'>
+                      <label>
+                        Varsta:
+                      </label>
+                      {cv.age}
+                    </p>
+
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              </SortableItem>
+            )}
+          />
 
           <div className='row flex-nowrap justify-content-center m-5'>
-            <button className='btn btn-primary btn-block col-6'>
+            <button className='btn btn-primary btn-block col-6 m-2' onClick={() => updateJob()}>
               <NavLink
                 className='nav-link no-href'
-                to='/create-cv'>
+                to={`/create-cv/${job?._id}`}>
                 Adauga CV
               </NavLink>
+            </button>
+
+            <button className='btn btn-primary btn-block col-6 m-2' onClick={() => updateJob()}>
+              Salveaza Post
             </button>
           </div>
 
@@ -124,14 +235,17 @@ const JobDetail = ({
   );
 };
 
-const mapStateToProps = ({ global, jobReducer: { jobDetail } }) => ({
+const mapStateToProps = ({ global, jobReducer: { jobDetail }, cvReducer: { cv: { loadCvs } } }) => ({
   global,
   jobDetail,
+  loadCvs
 });
 
 const mapDispatchToProps = {
   getJobDetailAction: action.getJobDetailAction,
-  getCvsForJobAction: action.getCvsForJobAction
+  getCvsForJobAction: action.getCvsForJobAction,
+  updateCvsAction: cvAction.updateCvsAction,
+  deleteCvAction: cvAction.deleteCvAction
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(JobDetail);

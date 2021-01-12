@@ -30,8 +30,8 @@ const app = Express();
 
 app.use([
   cors({ origin: true, credentials: false }),
-  bodyParser.json(),
-  bodyParser.urlencoded({ extended: true }),
+  bodyParser.json({ limit: '50mb' }),
+  bodyParser.urlencoded({ extended: true, limit: '50mb' }),
   serveFavicon(resolve(process.cwd(), 'public/assets/favicon.ico')),
   compression(),
   helmet(),

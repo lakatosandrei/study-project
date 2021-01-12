@@ -12,49 +12,48 @@ import { formatDate } from 'utils';
 import * as action from './action';
 import './styles.scss';
 
-const SortableItem = SortableElement(({ children }) => <div>{children}</div>);
+export const SortableItem = SortableElement(({ children }) => <div>{children}</div>);
 
-const SortableList = SortableContainer(({ items, renderItem }) => {
+export const SortableList = SortableContainer(({ items, renderItem, ...rest }) => {
   return (
-    <div>
+    <div {...rest}>
       {items.map((value, index) => renderItem(value, index))}
     </div>
   );
 });
 
-const DraggableHandle = SortableHandle(() => <span className='job__item__drag-handle'>::</span>);
+export const DraggableHandle = SortableHandle(() => <span className='cv__item__drag-handle'>::</span>);
 
-const Job = ({
-  route: { title },
-  job: {
-    jobs,
-    loadJobs,
+const Cv = ({
+  cv: {
+    cvs,
+    loadCvs,
     metaData: { total },
   },
-  deleteJobAction,
-  getJobsAction,
-  updateJobsAction,
+  deleteCvAction,
+  getCvsAction,
+  updateCvsAction,
 }) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    if (jobs) {
-      setItems(jobs);
+    if (cvs) {
+      setItems(cvs);
     }
-  }, [jobs]);
+  }, [cvs]);
 
   useEffect(() => {
-    getJobsAction();
+    getCvsAction();
   }, []);
 
   useEffect(() => {
-    if (loadJobs) {
-      getJobsAction();
+    if (loadCvs) {
+      getCvsAction();
     }
-  }, [loadJobs]);
+  }, [loadCvs]);
 
-  const updateJobs = throttle((newJobs) => {
-    updateJobsAction(newJobs);
+  const updateCvs = throttle((newCvs) => {
+    updateCvsAction(newCvs);
   }, 500, { trailing: true });
 
   const onSortEnd = ({ oldIndex, newIndex }) => {
@@ -64,37 +63,37 @@ const Job = ({
 
     items[newIndex].order = cachedOrder;
 
-    const newJobs = arrayMove(items, oldIndex, newIndex);
+    const newCvs = arrayMove(items, oldIndex, newIndex);
 
-    setItems(newJobs);
-    updateJobs(newJobs);
+    setItems(newCvs);
+    updateCvs(newCvs);
   };
 
   return (
-    <Layout title={title} needLogin>
+    <Layout title={'CV'} needLogin>
       <SortableList
         useDragHandle
         items={items}
         onSortEnd={onSortEnd}
-        renderItem={(job, index) => (
-          <SortableItem key={`job-item-${index}`} index={index}>
-            <div key={job._id} className='job__item'>
-              <div className='job__item__buttons'>
+        renderItem={(cv, index) => (
+          <SortableItem key={`cv-item-${index}`} index={index}>
+            <div key={cv._id} className='cv__item'>
+              <div className='cv__item__buttons'>
                 <DraggableHandle />
-                <div className='job__item__buttons__delete' onClick={() => deleteJobAction(job._id)}>
+                <div className='cv__item__buttons__delete' onClick={() => deleteCvAction(cv._id)}>
                   <i className='fa fa-trash' />
                 </div>
               </div>
-              <div className='job__item__content'>
+              <div className='cv__item__content'>
                 <div>
-                  {`${formatDate(job.publishAt)}`}
+                  {`${formatDate(cv.publishAt)}`}
                 </div>
 
-                <Link to={`/job/${job._id}`} className='job__title'>
-                  <h3>{job.title}</h3>
+                <Link to={`/cv/${cv._id}`} className='cv__title'>
+                  <h3>{cv.title}</h3>
                 </Link>
 
-                <p className='job__description'>{job.description}</p>
+                <p className='cv__description'>{cv.description}</p>
               </div>
             </div>
           </SortableItem>
@@ -113,7 +112,7 @@ const Job = ({
         <button className='btn btn-primary btn-block col-6'>
           <NavLink
             className='nav-link no-href'
-            to='/create-job'>
+            to='/create-cv'>
             Adauga
           </NavLink>
         </button>
@@ -122,12 +121,12 @@ const Job = ({
   );
 };
 
-const mapStateToProps = ({ jobReducer: { job } }) => ({ job });
+const mapStateToProps = ({ cvReducer: { cv } }) => ({ cv });
 
 const mapDispatchToProps = {
-  deleteJobAction: action.deleteJobAction,
-  getJobsAction: action.getJobsAction,
-  updateJobsAction: action.updateJobsAction,
+  deleteCvAction: action.deleteCvAction,
+  getCvsAction: action.getCvsAction,
+  updateCvsAction: action.updateCvsAction,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Job);
+export default connect(mapStateToProps, mapDispatchToProps)(Cv);

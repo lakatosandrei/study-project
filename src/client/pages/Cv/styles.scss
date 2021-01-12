@@ -1,6 +1,6 @@
 @import 'themes/global';
 
-.job {
+.cv {
   &__item {
     align-items: center;
     display: flex;
@@ -32,14 +32,6 @@
     &__detail {
       align-items: flex-start;
       flex-flow: column;
-
-      &__cv-list {
-        margin: 20px 0;
-
-        &__title {
-          margin: 20px 0;
-        }
-      }
     }
   }
 

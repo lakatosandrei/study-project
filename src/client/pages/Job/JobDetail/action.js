@@ -35,3 +35,27 @@ export const getCvsForJobAction = (_id: string) => (dispatch: Dispatch) =>
       },
     }),
   );
+
+export const PUT_JOBS = actionGenerator('@@PUT_JOBS');
+
+export const updateJobAction = (job: object = {}) => (dispatch: Dispatch) =>
+  dispatch(
+    requestAction({
+      url: '/job/update-jobs',
+      label: PUT_JOBS.NAME,
+      method: 'PUT',
+      data: { jobs: [job] },
+      onSuccess: ({ data }: ApiDataType) => {
+        dispatch({
+          type: PUT_JOBS.SUCCESS,
+          payload: data,
+        });
+      },
+      onError: ({ error }: ApiDataType) => {
+        dispatch({
+          type: PUT_JOBS.ERROR,
+          payload: error,
+        });
+      },
+    }),
+  );

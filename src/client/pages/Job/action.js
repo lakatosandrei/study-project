@@ -20,3 +20,38 @@ export const getJobsAction = (skip: number = 0) => (dispatch: Dispatch) =>
       },
     }),
   );
+
+export const DELETE_JOB = actionGenerator('@@DELETE_JOB');
+
+export const deleteJobAction = (_id: string) => (dispatch: Dispatch) =>
+  dispatch(
+    requestAction({
+      url: `/job/delete-job/${_id}`,
+      method: 'DELETE',
+      label: DELETE_JOB.NAME,
+      onSuccess: () => {
+        dispatch({ type: DELETE_JOB.SUCCESS });
+      },
+      onError: ({ error }: ApiDataType) => {
+        dispatch({ type: DELETE_JOB.ERROR, payload: error });
+      },
+    }),
+  );
+
+export const PUT_JOBS = actionGenerator('@@PUT_JOBS');
+
+export const updateJobsAction = (jobs: array = []) => (dispatch: Dispatch) =>
+  dispatch(
+    requestAction({
+      url: '/job/update-jobs',
+      label: PUT_JOBS.NAME,
+      method: 'PUT',
+      data: { jobs },
+      onSuccess: ({ data }: ApiDataType) => {
+        dispatch({ type: PUT_JOBS.SUCCESS, payload: data });
+      },
+      onError: ({ error }: ApiDataType) => {
+        dispatch({ type: PUT_JOBS.ERROR, payload: error });
+      },
+    }),
+  );

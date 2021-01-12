@@ -13,6 +13,7 @@ import {
 import {
   getCvsForJobAction, getJobDetailAction,
 } from 'pages/Job/JobDetail/action';
+import CreateCv from 'pages/Cv/CreateCv';
 import CreatePost from 'pages/Post/CreatePost';
 import CreateJob from 'pages/Job/CreateJob';
 import JobDetail from 'pages/Job/JobDetail';
@@ -21,6 +22,8 @@ import Projects from 'pages/Introduce/Projects';
 import Contact from 'pages/Contact';
 import NotFound from 'pages/NotFound';
 import App from './client/app';
+import CvDetail from 'pages/Cv/CvDetail';
+import { getCvDetailAction } from 'pages/Cv/CvDetail/action';
 
 export default [
   {
@@ -51,6 +54,18 @@ export default [
         path: '/create-job',
         component: CreateJob,
         title: 'Create job',
+      },
+      {
+        path: '/create-cv/:_id',
+        component: CreateCv,
+        title: 'Create Cv',
+      },
+      {
+        path: '/cv/:_id',
+        component: CvDetail,
+        loadData: ({ params: { _id } }) => [
+          getCvDetailAction(_id)
+        ],
       },
       {
         path: '/posts',

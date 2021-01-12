@@ -30,6 +30,7 @@ const aggregateLookupJob = [
     $project: {
       title: true,
       description: true,
+      order: true
     },
   }
 ];
@@ -43,7 +44,7 @@ export const getJobsController = () => async (req: Request, res: Response) => {
   try {
     const { values: jobs, metaData } = await usePaging({
       collection: jobsCollection,
-      aggregate: [...aggregateLookupUser, ...aggregateLookupJob, { $sort: { publishAt: -1 } }],
+      aggregate: [...aggregateLookupUser, ...aggregateLookupJob, { $sort: { order: 1, publishAt: -1 } }],
       skip,
     });
 
@@ -53,7 +54,6 @@ export const getJobsController = () => async (req: Request, res: Response) => {
       }),
     );
   } catch (error) {
-    console.log('LOGARE', error);
     return res.json(genericError({ message: error.message }));
   }
 };
@@ -97,11 +97,19 @@ export const createJobController = () => async (
   }
 
   try {
+    const lastJob = await jobsCollection.find().sort({ order: -1 }).limit(1).toArray();
+    let order = 1;
+
+    if (lastJob[0]) {
+      order += lastJob[0].order;
+    }
+
     const { ops } = await jobsCollection.insertOne(
       {
         title,
         description,
         content,
+        order,
         cvs: [],
         publishAt: new Date(),
         user_id: user._id,
@@ -110,6 +118,46 @@ export const createJobController = () => async (
     );
 
     return res.json(resultModel({ data: head(ops) }));
+  } catch (error) {
+    return res.json(genericError({ message: error.message }));
+  }
+};
+
+export const updateJobsController = () => async (
+  req: Request,
+  res: Response,
+) => {
+  const {
+    body: { jobs },
+    jobsCollection,
+  } = req;
+
+  if (!jobs) {
+    return res.json(badRequest());
+  }
+
+  try {
+    const promises = [];
+
+    jobs.forEach((job) => {
+      const { _id, content, description, order, title } = job;
+
+      promises.push(jobsCollection.findOneAndUpdate({ _id: { $eq: ObjectId(_id) } }, { $set: { content, description, order, title } }));
+    });
+
+    await Promise.all(promises);
+
+    const { values: newJobs, metaData } = await usePaging({
+      collection: jobsCollection,
+      aggregate: [...aggregateLookupUser, ...aggregateLookupJob, { $sort: { order: 1, publishAt: -1 } }],
+      skip: 0
+    });
+
+    return res.json(
+      resultModel({
+        data: { jobs: newJobs, metaData },
+      }),
+    );
   } catch (error) {
     return res.json(genericError({ message: error.message }));
   }
