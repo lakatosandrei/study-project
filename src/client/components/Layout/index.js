@@ -144,10 +144,11 @@ const Layout = (props) => {
     needLogin,
     returnPath = '/',
     location: { pathname },
-    global: { accessToken, refreshToken, user },
+    global: { accessToken, refreshToken, user, participant },
     fetchTokenAction,
     renewTokenAction,
     getMeAction,
+    getParticipant
   } = props;
 
   const lastLocation = useLastLocation();
@@ -161,6 +162,10 @@ const Layout = (props) => {
 
     if (!user) {
       getMeAction();
+    }
+
+    if (!participant) {
+      getParticipant();
     }
 
     // Reset scroll.
@@ -195,6 +200,7 @@ const mapDispatchToProps = {
   fetchTokenAction: globalAction.fetchTokenAction,
   renewTokenAction: globalAction.renewTokenAction,
   getMeAction: globalAction.getMeAction,
+  getParticipant: globalAction.getParticipant,
   updateThemeAction: globalAction.updateThemeAction,
   updateTokenAction: globalAction.updateTokenAction,
 };

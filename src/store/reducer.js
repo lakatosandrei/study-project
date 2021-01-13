@@ -11,7 +11,9 @@ import jobReducer from 'pages/Job/reducer';
 import cvReducer from 'pages/Cv/reducer';
 import { UPDATE_PARTICIPANT } from 'pages/Home/action';
 import studyReducer from 'pages/Study/reducer';
-import { UPDATE_TOKEN, UPDATE_LOADING, UPDATE_THEME, GET_ME } from './action';
+import cookies from 'utils/cookies';
+
+import { UPDATE_TOKEN, UPDATE_LOADING, UPDATE_THEME, GET_ME, GET_PARTICIPANT } from './action';
 
 const initialState: GlobalStateType = {
   isLoading: false,
@@ -26,7 +28,7 @@ const global = (state: any = initialState, action: ActionType) => {
     case UPDATE_PARTICIPANT.SUCCESS: {
       const { participant } = action.payload;
 
-      localStorage.setItem('participant', JSON.stringify(participant));
+      cookies.set('participantId', participant._id);
 
       return { ...state, participant };
     }
@@ -47,6 +49,14 @@ const global = (state: any = initialState, action: ActionType) => {
     }
     case UPDATE_THEME: {
       return { ...state, theme: action.payload };
+    }
+    case GET_PARTICIPANT.SUCCESS: {
+      const { participant } = action.payload;
+
+      return { ...state, participant };
+    }
+    case GET_PARTICIPANT.ERROR: {
+      return { ...state, participant: null };
     }
     case GET_ME.SUCCESS: {
       return { ...state, user: action.payload };

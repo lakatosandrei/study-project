@@ -3,7 +3,7 @@ import auth from './auth';
 import generic from './generic';
 import cv from './cv';
 import study from './study';
-import participants from './participants';
+import participant from './participant';
 import job from './job';
 import comment from './comment';
 
@@ -17,7 +17,7 @@ router.use('/job', job);
 
 router.use('/study', study);
 
-router.use('/participants', participants);
+router.use('/participant', participant);
 
 router.use('/comment', comment);
 

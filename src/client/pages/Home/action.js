@@ -7,7 +7,7 @@ export const UPDATE_PARTICIPANT = actionGenerator('@@UPDATE_PARTICIPANT');
 export const updateParticipant = (participant) => (dispatch) =>
   dispatch(
     requestAction({
-      url: '/participants',
+      url: '/participant',
       label: UPDATE_PARTICIPANT.NAME,
       method: 'POST',
       data: { participant },

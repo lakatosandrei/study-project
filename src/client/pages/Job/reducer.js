@@ -1,7 +1,7 @@
 /* @flow */
 import { combineReducers } from 'redux';
 import { type ActionType } from 'types';
-import { DELETE_JOB, GET_JOBS, PUT_JOBS } from './action';
+import { DELETE_JOB, GET_JOBS, GET_PARTICIPANTS, PUT_JOBS } from './action';
 import createJob from './CreateJob/reducer';
 import jobDetail from './JobDetail/reducer';
 
@@ -26,6 +26,7 @@ const job = (state: any = initialState, action: ActionType) => {
         metaData: { ...metaData },
       };
     }
+    case GET_PARTICIPANTS.ERROR:
     case DELETE_JOB.ERROR:
     case PUT_JOBS.ERROR:
     case GET_JOBS.ERROR: {
@@ -38,6 +39,14 @@ const job = (state: any = initialState, action: ActionType) => {
         ...state,
         jobs: [...jobs],
         metaData: { ...metaData },
+      };
+    }
+    case GET_PARTICIPANTS.SUCCESS: {
+      const { participants } = action.payload;
+
+      return {
+        ...state,
+        participants
       };
     }
     case DELETE_JOB.SUCCESS: {

@@ -26,8 +26,9 @@ let Questionnaire = ({
       reviewed: [
         ...participant.reviewed,
         {
+          cv_id: cv._id,
           job_id: cv.project_id,
-          value
+          ...value
         }
       ]
     });
@@ -77,6 +78,7 @@ let Questionnaire = ({
                   </b>
                   <ReactSlider
                     min={1}
+                    step={0.1}
                     max={10}
                     className="horizontal-slider"
                     thumbClassName="example-thumb"

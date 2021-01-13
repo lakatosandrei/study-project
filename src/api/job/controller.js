@@ -39,6 +39,7 @@ export const getJobsController = () => async (req: Request, res: Response) => {
   const {
     jobsCollection,
     participantsCollection,
+    cvsCollection,
     query: { participant: participantId },
   } = req;
 
@@ -50,14 +51,32 @@ export const getJobsController = () => async (req: Request, res: Response) => {
         { $sort: { order: 1, publishAt: -1 } }
       ])
       .toArray();
+
     const participant = await participantsCollection.findOne({ _id: ObjectId(participantId) });
 
     if (participant) {
+      const jobCvsMap = {};
+      const allCvs = await cvsCollection.find().toArray();
       const reviewed = participant.reviewed || [];
 
-      jobs = jobs.filter(job => {
-        return reviewed.findIndex(review => review.job_id !== job._id) < 0;
+      allCvs.forEach(cv => {
+        if (!jobCvsMap[cv.project_id]) {
+          jobCvsMap[cv.project_id] = [];
+        }
+
+        jobCvsMap[cv.project_id].push(cv);
       });
+
+      if (reviewed.length) {
+        jobs = jobs.filter(job => {
+          const cvNr = jobCvsMap[job._id].length;
+          const reviewedCvs = reviewed.filter(review => {
+            return `${review.job_id}` === `${job._id}`;
+          });
+
+          return cvNr !== reviewedCvs.length;
+        });
+      }
     }
 
     return res.json(

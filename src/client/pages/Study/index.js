@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
+import { NavLink, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
 
 import Layout from 'components/Layout';
 
 import * as action from './action';
-import { NavLink } from 'react-router-dom';
 
 let Study = ({
   getStudyAction,
   handleSubmit,
   updateStudyAction,
   study,
-  global: { accessToken },
+  global: { accessToken, participant },
   route: { title }
 }) => {
   useEffect(() => {
@@ -22,6 +22,10 @@ let Study = ({
   const onSubmit = async (value) => {
     updateStudyAction(value);
   };
+
+  if (!accessToken && !participant) {
+    return <Redirect to={'/'} />
+  }
 
   return (
     <Layout title={title}>

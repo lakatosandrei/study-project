@@ -80,10 +80,10 @@ let Home = ({ history, handleSubmit, updateParticipant, mockJoin, route: { title
               </b>
 
               <div>
-                <label htmlFor='sex-male'>Barbat</label>
+                <label htmlFor='gener-male'>Barbat</label>
                 <Field
-                  id='sex-male'
-                  name='sex'
+                  id='gener-male'
+                  name='gener'
                   type='radio'
                   component='input'
                   className='form-control custom-radio'
@@ -92,10 +92,10 @@ let Home = ({ history, handleSubmit, updateParticipant, mockJoin, route: { title
               </div>
 
               <div>
-                <label htmlFor='sex-female'>Femeie</label>
+                <label htmlFor='gener-female'>Femeie</label>
                 <Field
-                  id='sex-female'
-                  name='sex'
+                  id='gener-female'
+                  name='gener'
                   type='radio'
                   component='input'
                   className='form-control custom-radio'

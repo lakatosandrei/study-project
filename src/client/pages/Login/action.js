@@ -1,10 +1,14 @@
 import { toast } from 'react-toastify';
 import { actionGenerator } from 'utils';
 import { requestAction } from 'utils/request';
-import { updateTokenAction } from 'store/action';
+import { GET_PARTICIPANT, updateTokenAction } from 'store/action';
+import cookies from 'utils/cookies';
 
 export const LOGIN_ACTION = actionGenerator('@@LOGIN_ACTION');
-export const loginAction = (data) => (dispatch) =>
+export const loginAction = (data) => (dispatch) => {
+  cookies.remove('participantId');
+  dispatch({ type: GET_PARTICIPANT.ERROR });
+
   dispatch(
     requestAction({
       url: '/auth/login',
@@ -19,3 +23,4 @@ export const loginAction = (data) => (dispatch) =>
       },
     }),
   );
+};

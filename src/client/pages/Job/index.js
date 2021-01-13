@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
+import omit from 'lodash/omit';
 import throttle from 'lodash/throttle';
 
 import Layout from 'components/Layout';
@@ -28,13 +29,14 @@ const Job = ({
   global: { accessToken, participant },
   route: { title },
   job: {
+    participants,
     jobs,
-    loadJobs,
-    metaData: { total },
+    loadJobs
   },
   deleteJobAction,
   getJobsAction,
   updateJobsAction,
+  getParticipants
 }) => {
   const [items, setItems] = useState([]);
 
@@ -49,10 +51,10 @@ const Job = ({
   }, []);
 
   useEffect(() => {
-    if (loadJobs) {
+    if (loadJobs || participant) {
       getJobsAction(participant);
     }
-  }, [loadJobs]);
+  }, [loadJobs, participant]);
 
   const updateJobs = throttle((newJobs) => {
     updateJobsAction(newJobs);
@@ -69,6 +71,51 @@ const Job = ({
 
     setItems(newJobs);
     updateJobs(newJobs);
+  };
+
+  useEffect(() => {
+    if (participants) {
+      const data = [];
+
+      participants.forEach((part) => {
+        const { reviewed, ...rest } = part;
+
+        if (data.length === 0) {
+          data.push([
+            'job',
+            'cv',
+            ...Object.keys(rest),
+            ...Object.keys(omit(reviewed[0], '_id', 'job_id', 'cv_id', 'job', 'cv'))
+          ]);
+        }
+
+        reviewed.forEach((rev) => {
+          data.push([
+            rev.job.title,
+            rev.cv.name,
+            ...Object.values(rest),
+            ...Object.values(omit(rev, '_id', 'job_id', 'cv_id', 'job', 'cv'))
+          ]);
+        });
+      });
+
+      const csvContent = `data:text/csv;charset=utf-8,${data.map(e => e.join(",")).join("\n")}`;
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "my_data.csv");
+      document.body.appendChild(link); // Required for FF
+
+      link.click(); // This will download
+
+      link.remove();
+    }
+  }, [participants])
+
+  const downloadCsv = () => {
+    getParticipants();
   };
 
   return (
@@ -107,7 +154,7 @@ const Job = ({
       />
 
       {
-        accessToken && total === 0 && (
+        accessToken && jobs?.length === 0 && (
           <h2>
             Nu exista un post momentan, te rog adauga unul.
           </h2>
@@ -115,7 +162,7 @@ const Job = ({
       }
 
       {
-        !accessToken && total === 0 && (
+        !accessToken && jobs?.length === 0 && (
           <h2>
             Multumim ca ai participat la studiu.
           </h2>
@@ -123,13 +170,16 @@ const Job = ({
       }
 
       {accessToken && (
-        <div className='row flex-nowrap justify-content-center'>
-          <button className='btn btn-primary btn-block col-6'>
+        <div className='row flex-nowrap justify-content-center m-5'>
+          <button className='btn btn-primary btn-block col-6 m-2'>
             <NavLink
               className='nav-link no-href'
               to='/create-job'>
-              Adauga
+              Adauga Post
             </NavLink>
+          </button>
+          <button className='btn btn-primary btn-block col-6 m-2' onClick={downloadCsv}>
+            Download
           </button>
         </div>
       )}
@@ -143,6 +193,7 @@ const mapDispatchToProps = {
   deleteJobAction: action.deleteJobAction,
   getJobsAction: action.getJobsAction,
   updateJobsAction: action.updateJobsAction,
+  getParticipants: action.getParticipants
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Job);

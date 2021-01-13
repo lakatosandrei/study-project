@@ -103,3 +103,26 @@ export const getMeAction = () => async (
     }),
   );
 };
+
+export const GET_PARTICIPANT = actionGenerator('@@GET_PARTICIPANT');
+export const getParticipant = () => async (
+  dispatch: Dispatch
+) => {
+  const participantId = cookies.get('participantId');
+
+  return dispatch(
+    requestAction({
+      url: `/participant/${participantId}`,
+      label: GET_PARTICIPANT.NAME,
+      onSuccess: ({ data }: ApiDataType) => {
+        dispatch({
+          type: GET_PARTICIPANT.SUCCESS,
+          payload: data,
+        });
+      },
+      onError: async ({ error }: ApiDataType) => {
+        dispatch({ type: GET_PARTICIPANT.ERROR, payload: error });
+      },
+    }),
+  );
+};

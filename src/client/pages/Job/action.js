@@ -3,6 +3,7 @@ import { type Dispatch } from 'redux';
 import { type ApiDataType } from 'types';
 import { actionGenerator } from 'utils';
 import { requestAction } from 'utils/request';
+import cookies from 'utils/cookies';
 
 export const GET_JOBS = actionGenerator('@@GET_JOBS');
 
@@ -56,3 +57,24 @@ export const updateJobsAction = (jobs: array = []) => (dispatch: Dispatch) =>
       },
     }),
   );
+
+export const GET_PARTICIPANTS = actionGenerator('@@GET_PARTICIPANTS');
+export const getParticipants = () => async (
+  dispatch: Dispatch
+) => {
+  return dispatch(
+    requestAction({
+      url: `/participant`,
+      label: GET_PARTICIPANTS.NAME,
+      onSuccess: ({ data }: ApiDataType) => {
+        dispatch({
+          type: GET_PARTICIPANTS.SUCCESS,
+          payload: data,
+        });
+      },
+      onError: async ({ error }: ApiDataType) => {
+        dispatch({ type: GET_PARTICIPANTS.ERROR, payload: error });
+      },
+    }),
+  );
+};

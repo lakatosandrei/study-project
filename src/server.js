@@ -54,7 +54,7 @@ app.use(
     /\/api\/study/,
     /\/api\/job/,
     /\/api\/cv/,
-    /\/api\/participants/,
+    /\/api\/participant/,
   ]),
 );
 
