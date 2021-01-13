@@ -59,7 +59,10 @@ export const usePaging = async ({
   };
 };
 
-export const createInitialDbValues = async (usersCollection) => {
+export const createInitialDbValues = async ({
+  usersCollection,
+  studyCollection
+}) => {
   const userAdmin = await usersCollection.findOne({ email: 'admin@admin.com' });
 
   if (!userAdmin) {
@@ -67,6 +70,18 @@ export const createInitialDbValues = async (usersCollection) => {
       {
         email: 'admin@admin.com',
         password: hashPassword('admin'),
+      },
+      { serializeFunctions: true },
+    );
+  }
+
+  const mainStudy = await studyCollection.findOne({});
+
+  if (!mainStudy) {
+    await studyCollection.insertOne(
+      {
+        title: 'Studiu',
+        details: 'Detalii studiu',
       },
       { serializeFunctions: true },
     );

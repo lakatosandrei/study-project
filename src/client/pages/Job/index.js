@@ -25,6 +25,7 @@ const SortableList = SortableContainer(({ items, renderItem }) => {
 const DraggableHandle = SortableHandle(() => <span className='job__item__drag-handle'>::</span>);
 
 const Job = ({
+  global: { accessToken, participant },
   route: { title },
   job: {
     jobs,
@@ -44,12 +45,12 @@ const Job = ({
   }, [jobs]);
 
   useEffect(() => {
-    getJobsAction();
+    getJobsAction(participant);
   }, []);
 
   useEffect(() => {
     if (loadJobs) {
-      getJobsAction();
+      getJobsAction(participant);
     }
   }, [loadJobs]);
 
@@ -71,7 +72,7 @@ const Job = ({
   };
 
   return (
-    <Layout title={title} needLogin>
+    <Layout title={title}>
       <SortableList
         useDragHandle
         items={items}
@@ -79,12 +80,16 @@ const Job = ({
         renderItem={(job, index) => (
           <SortableItem key={`job-item-${index}`} index={index}>
             <div key={job._id} className='job__item'>
-              <div className='job__item__buttons'>
-                <DraggableHandle />
-                <div className='job__item__buttons__delete' onClick={() => deleteJobAction(job._id)}>
-                  <i className='fa fa-trash' />
-                </div>
-              </div>
+              {
+                accessToken && (
+                  <div className='job__item__buttons'>
+                    <DraggableHandle />
+                    <div className='job__item__buttons__delete' onClick={() => deleteJobAction(job._id)}>
+                      <i className='fa fa-trash' />
+                    </div>
+                  </div>
+                )
+              }
               <div className='job__item__content'>
                 <div>
                   {`${formatDate(job.publishAt)}`}
@@ -102,27 +107,37 @@ const Job = ({
       />
 
       {
-        total === 0 && (
+        accessToken && total === 0 && (
           <h2>
             Nu exista un post momentan, te rog adauga unul.
           </h2>
         )
       }
 
-      <div className='row flex-nowrap justify-content-center'>
-        <button className='btn btn-primary btn-block col-6'>
-          <NavLink
-            className='nav-link no-href'
-            to='/create-job'>
-            Adauga
-          </NavLink>
-        </button>
-      </div>
+      {
+        !accessToken && total === 0 && (
+          <h2>
+            Multumim ca ai participat la studiu.
+          </h2>
+        )
+      }
+
+      {accessToken && (
+        <div className='row flex-nowrap justify-content-center'>
+          <button className='btn btn-primary btn-block col-6'>
+            <NavLink
+              className='nav-link no-href'
+              to='/create-job'>
+              Adauga
+            </NavLink>
+          </button>
+        </div>
+      )}
     </Layout>
   );
 };
 
-const mapStateToProps = ({ jobReducer: { job } }) => ({ job });
+const mapStateToProps = ({ global, jobReducer: { job } }) => ({ global, job });
 
 const mapDispatchToProps = {
   deleteJobAction: action.deleteJobAction,

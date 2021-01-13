@@ -4,17 +4,19 @@ import { Field, reduxForm } from 'redux-form';
 import { Redirect } from 'react-router-dom';
 // import { isEmail } from 'validator';
 
+import { mockJoin } from 'pages/Home/action';
 import Layout from 'components/Layout';
 
 import * as action from './action';
 
-let Home = ({ history, handleSubmit, joinAction, route: { title }, global: { accessToken, user }, }) => {
+let Home = ({ history, handleSubmit, updateParticipant, mockJoin, route: { title }, global: { accessToken, user, participant }, }) => {
   const onSubmit = async (value) => {
-    joinAction(value);
+    updateParticipant(value);
+    // mockJoin(value);
   };
 
-  if (accessToken && user) {
-    return <Redirect to='/jobs' />;
+  if ((accessToken && user) || participant) {
+    return <Redirect to='/study' />;
   }
 
   return (
@@ -123,7 +125,7 @@ const mapStateToProps = ({ global, login }) => ({
 });
 
 const mapDispatchToProps = {
-  joinAction: action.joinAction,
+  updateParticipant: action.updateParticipant
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

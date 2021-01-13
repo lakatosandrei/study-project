@@ -18,13 +18,20 @@ const useMongo = ({
     .then(async (client) => {
       const db = client.db(database);
 
+      const studyCollection = db.collection('study');
+
+      const participantsCollection = db.collection('participants');
+
       const usersCollection = db.collection('users');
 
       const jobsCollection = db.collection('jobs');
 
       const cvsCollection = db.collection('cvs');
 
-      await createInitialDbValues(usersCollection);
+      await createInitialDbValues({
+        studyCollection,
+        usersCollection
+      });
 
       const result: MongoResultType = {
         client,
@@ -36,6 +43,8 @@ const useMongo = ({
 
         Object.assign(request, {
           ...result,
+          studyCollection,
+          participantsCollection,
           usersCollection,
           jobsCollection,
           cvsCollection,

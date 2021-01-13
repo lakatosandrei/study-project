@@ -38,19 +38,31 @@ const aggregateLookupJob = [
 export const getJobsController = () => async (req: Request, res: Response) => {
   const {
     jobsCollection,
-    query: { skip = 0 },
+    participantsCollection,
+    query: { participant: participantId },
   } = req;
 
   try {
-    const { values: jobs, metaData } = await usePaging({
-      collection: jobsCollection,
-      aggregate: [...aggregateLookupUser, ...aggregateLookupJob, { $sort: { order: 1, publishAt: -1 } }],
-      skip,
-    });
+    let jobs = await jobsCollection
+      .aggregate([
+        ...aggregateLookupUser,
+        ...aggregateLookupJob,
+        { $sort: { order: 1, publishAt: -1 } }
+      ])
+      .toArray();
+    const participant = await participantsCollection.findOne({ _id: ObjectId(participantId) });
+
+    if (participant) {
+      const reviewed = participant.reviewed || [];
+
+      jobs = jobs.filter(job => {
+        return reviewed.findIndex(review => review.job_id !== job._id) < 0;
+      });
+    }
 
     return res.json(
       resultModel({
-        data: { jobs, metaData },
+        data: { jobs },
       }),
     );
   } catch (error) {

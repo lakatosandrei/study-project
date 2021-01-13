@@ -65,11 +65,11 @@ const JobDetail = ({
 
   const onDescriptionChange = ({ target: { value } }) => setDescription(value);
 
-  const [source, setSource] = useState(job?.content);
+  const [source, setSource] = useState(job?.content || '');
 
   useEffect(() => {
     if (job) {
-      setSource(job.content);
+      setSource(job.content || '');
       setTitleJob(job.title)
       setDescription(job.description);
     }
@@ -123,13 +123,21 @@ const JobDetail = ({
             Titlu
           </label>
 
-          <input
-            id='title-job'
-            className='form-control'
-            placeholder='Titlu'
-            value={titleJob}
-            onChange={onTitleJobChange}
-          />
+          {!accessToken && (
+            <h4>
+              {titleJob}
+            </h4>
+          )}
+
+          {accessToken && (
+            <input
+              id='title-job'
+              className='form-control'
+              placeholder='Titlu'
+              value={titleJob}
+              onChange={onTitleJobChange}
+            />
+          )}
         </div>
 
         <div className='job__item__field'>
@@ -137,13 +145,21 @@ const JobDetail = ({
             Descriere
           </label>
 
-          <input
-            id='description-job'
-            className='form-control'
-            placeholder='Descriere'
-            value={description}
-            onChange={onDescriptionChange}
-          />
+          {!accessToken && (
+            <h4>
+              {description}
+            </h4>
+          )}
+
+          {accessToken && (
+            <input
+              id='description-job'
+              className='form-control'
+              placeholder='Descriere'
+              value={description}
+              onChange={onDescriptionChange}
+            />
+          )}
         </div>
 
       </div>
@@ -154,20 +170,23 @@ const JobDetail = ({
         <div className='cv__container'>
           <h5>Responsabilitati si sarcini</h5>
 
+          {!accessToken && (
+            <code>
+              {source}
+            </code>
+          )}
           {accessToken && (
-            <>
-              <ReactMde
-                selectedTab={selectedTab}
-                onTabChange={setSelectedTab}
-                onChange={onInputChange}
-                value={source}
-                generateMarkdownPreview={async (markdown) => {
-                  const html = makeEmojiHtml(markdown);
+            <ReactMde
+              selectedTab={selectedTab}
+              onTabChange={setSelectedTab}
+              onChange={onInputChange}
+              value={source}
+              generateMarkdownPreview={async (markdown) => {
+                const html = makeEmojiHtml(markdown);
 
-                  return html;
-                }}
-              />
-            </>
+                return html;
+              }}
+            />
           )}
 
           <h4 className='job__item__detail__cv-list__title'>Lista CV-uri</h4>
@@ -180,12 +199,14 @@ const JobDetail = ({
             renderItem={(cv, index) => (
               <SortableItem key={`cv-item-${index}`} index={index}>
                 <div key={cv._id} className='cv__item'>
-                  <div className='cv__item__buttons'>
-                    <DraggableHandle />
-                    <div className='cv__item__buttons__delete' onClick={() => deleteCvAction(cv._id)}>
-                      <i className='fa fa-trash' />
+                  {accessToken && (
+                    <div className='cv__item__buttons'>
+                      <DraggableHandle />
+                      <div className='cv__item__buttons__delete' onClick={() => deleteCvAction(cv._id)}>
+                        <i className='fa fa-trash' />
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <div className='cv__item__content'>
                     <div>
                       {`${formatDate(cv.publishAt)}`}
@@ -215,19 +236,23 @@ const JobDetail = ({
             )}
           />
 
-          <div className='row flex-nowrap justify-content-center m-5'>
-            <button className='btn btn-primary btn-block col-6 m-2' onClick={() => updateJob()}>
-              <NavLink
-                className='nav-link no-href'
-                to={`/create-cv/${job?._id}`}>
-                Adauga CV
-              </NavLink>
-            </button>
+          {
+            accessToken && (
+              <div className='row flex-nowrap justify-content-center m-5'>
+                <button className='btn btn-primary btn-block col-6 m-2' onClick={() => updateJob()}>
+                  <NavLink
+                    className='nav-link no-href'
+                    to={`/create-cv/${job?._id}`}>
+                    Adauga CV
+                  </NavLink>
+                </button>
 
-            <button className='btn btn-primary btn-block col-6 m-2' onClick={() => updateJob()}>
-              Salveaza Post
-            </button>
-          </div>
+                <button className='btn btn-primary btn-block col-6 m-2' onClick={() => updateJob()}>
+                  Salveaza Post
+                </button>
+              </div>
+            )
+          }
 
         </div>
       )}
@@ -244,6 +269,7 @@ const mapStateToProps = ({ global, jobReducer: { jobDetail }, cvReducer: { cv: {
 const mapDispatchToProps = {
   getJobDetailAction: action.getJobDetailAction,
   getCvsForJobAction: action.getCvsForJobAction,
+  updateJobAction: action.updateJobAction,
   updateCvsAction: cvAction.updateCvsAction,
   deleteCvAction: cvAction.deleteCvAction
 };

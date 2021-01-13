@@ -6,12 +6,12 @@ import { requestAction } from 'utils/request';
 
 export const GET_JOBS = actionGenerator('@@GET_JOBS');
 
-export const getJobsAction = (skip: number = 0) => (dispatch: Dispatch) =>
+export const getJobsAction = (participant) => (dispatch: Dispatch) => {
   dispatch(
     requestAction({
-      url: '/job/newest',
+      url: `/job/newest`,
       label: GET_JOBS.NAME,
-      params: { skip },
+      params: { participant: participant?._id },
       onSuccess: ({ data }: ApiDataType) => {
         dispatch({ type: GET_JOBS.SUCCESS, payload: data });
       },
@@ -20,6 +20,7 @@ export const getJobsAction = (skip: number = 0) => (dispatch: Dispatch) =>
       },
     }),
   );
+};
 
 export const DELETE_JOB = actionGenerator('@@DELETE_JOB');
 

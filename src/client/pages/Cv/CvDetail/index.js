@@ -10,11 +10,24 @@ import MdViewer, { makeEmojiHtml } from 'components/MdViewer';
 
 import * as action from './action';
 import '../styles.scss';
+import Questionnaire from 'pages/Questionnaire';
+
+const GENDER_MAP = {
+  'male': 'Barbat',
+  'female': 'Femeie'
+};
+
+const MARITAL_STATUS_MAP = {
+  'unmarried male': 'Necasatorit',
+  'married male': 'Casatorit',
+  'unmarried female': 'Necasatorita',
+  'married female': 'Casatorita'
+};
 
 const CvDetail = ({
   match: { params },
   global: { accessToken },
-  cvDetail: { cv, cvs, error },
+  cvDetail: { cv, error },
   getCvDetailAction,
   getCvsForCvAction,
   updateCvAction
@@ -53,7 +66,7 @@ const CvDetail = ({
 
   const onMaritalStatusCvChange = ({ target: { value } }) => setMaritalStatus(value);
 
-  const [selectedTab, setSelectedTab] = useState('preview');
+  const [selectedTab, setSelectedTab] = useState(!accessToken ? 'preview' : 'write');
 
   const [education, setEducation] = useState(cv?.education);
 
@@ -112,6 +125,17 @@ const CvDetail = ({
     }, cv.project_id);
   };
 
+  const options = [{
+    value: 'unmarried',
+    label: 'Necasatorit',
+  }, {
+    value: 'married',
+    label: 'Casatorit',
+  }].map(opt => gender === 'male' ? opt : {
+    ...opt,
+    label: `${opt.label}a`,
+  });
+
   return (
     <Layout title={cv?.name || ''}>
       <div className='cv__item cv__item__detail'>
@@ -122,16 +146,20 @@ const CvDetail = ({
 
           <img src={profilePicture} />
 
-          <input
-            id="profilePicture-cv"
-            type="file"
-            inputProps={{ accept: 'image/*' }}
-            label="Poza de profil"
-            name="profilePicture"
-            onChange={e => handlePictureUpload(e)}
-            size="small"
-            variant="standard"
-          />
+          {
+            accessToken && (
+              <input
+                id="profilePicture-cv"
+                type="file"
+                accept='image/*'
+                label="Poza de profil"
+                name="profilePicture"
+                onChange={e => handlePictureUpload(e)}
+                size="small"
+                variant="standard"
+              />
+            )
+          }
         </div>
 
         <div className='cv__item__field'>
@@ -139,13 +167,21 @@ const CvDetail = ({
             Nume
           </label>
 
-          <input
-            id='name-cv'
-            className='form-control'
-            placeholder='Nume'
-            value={name}
-            onChange={onNameCvChange}
-          />
+          {!accessToken && (
+            <h4>
+              {name}
+            </h4>
+          )}
+
+          {accessToken && (
+            <input
+              id='name-cv'
+              className='form-control'
+              placeholder='Nume'
+              value={name}
+              onChange={onNameCvChange}
+            />
+          )}
         </div>
 
         <div className='cv__item__field'>
@@ -153,10 +189,20 @@ const CvDetail = ({
             Gen
           </label>
 
-          <select name="gender-cv" id="gender-cv" value={gender} onChange={onGenderCvChange}>
-            <option value="male">Barbat</option>
-            <option value="female">Femeie</option>
-          </select>
+          {!accessToken && (
+            <h4>
+              {GENDER_MAP[gender]}
+            </h4>
+          )}
+
+          {
+            accessToken && (
+              <select name="gender-cv" id="gender-cv" value={gender} onChange={onGenderCvChange}>
+                <option value="male">Barbat</option>
+                <option value="female">Femeie</option>
+              </select>
+            )
+          }
 
         </div>
 
@@ -165,14 +211,24 @@ const CvDetail = ({
             Varsta
           </label>
 
-          <input
-            id='age-cv'
-            className='form-control'
-            placeholder='Varsta'
-            type='number'
-            value={age}
-            onChange={onAgeCvChange}
-          />
+          {!accessToken && (
+            <h4>
+              {age}
+            </h4>
+          )}
+
+          {
+            accessToken && (
+              <input
+                id='age-cv'
+                className='form-control'
+                placeholder='Varsta'
+                type='number'
+                value={age}
+                onChange={onAgeCvChange}
+              />
+            )
+          }
         </div>
 
         <div className='cv__item__field'>
@@ -180,10 +236,19 @@ const CvDetail = ({
             Statut marital
           </label>
 
-          <select name="maritalStatus-cv" id="maritalStatus-cv" value={maritalStatus} onChange={onMaritalStatusCvChange}>
-            <option value="male">Barbat</option>
-            <option value="female">Femeie</option>
-          </select>
+          {!accessToken && (
+            <h4>
+              {MARITAL_STATUS_MAP[`${maritalStatus} ${gender}`]}
+            </h4>
+          )}
+
+          {accessToken && (
+            <select name="maritalStatus-cv" id="maritalStatus-cv" value={maritalStatus} onChange={onMaritalStatusCvChange}>
+              {options.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          )}
 
         </div>
 
@@ -193,61 +258,69 @@ const CvDetail = ({
 
       {cv && (
         <div className='cv__container'>
-          <h5>Responsabilitati si sarcini</h5>
+          <h5>Educatie</h5>
 
-          <ReactMde
-            selectedTab={selectedTab}
-            onTabChange={setSelectedTab}
-            onChange={onEducationInputChange}
-            value={education}
-            generateMarkdownPreview={async (markdown) => {
-              const html = makeEmojiHtml(markdown);
+          {!accessToken && (
+            <code>
+              {education}
+            </code>
+          )}
 
-              return html;
-            }}
-          />
+          {accessToken && (
+            <ReactMde
+              selectedTab={selectedTab}
+              onTabChange={setSelectedTab}
+              onChange={onEducationInputChange}
+              value={education}
+              generateMarkdownPreview={async (markdown) => {
+                const html = makeEmojiHtml(markdown);
 
-          <ReactMde
-            selectedTab={selectedTab}
-            onTabChange={setSelectedTab}
-            onChange={onSkillsInputChange}
-            value={skills}
-            generateMarkdownPreview={async (markdown) => {
-              const html = makeEmojiHtml(markdown);
+                return html;
+              }}
+            />
+          )}
 
-              return html;
-            }}
-          />
+          <h5>Aptitudini</h5>
 
-          {cvs?.map((cv) => (
-            <div className='card cv__item' key={cv._id}>
-              <div className='card-body'>
-                <div>{cv.user?.name}</div>
+          {!accessToken && (
+            <code>
+              {skills}
+            </code>
+          )}
 
-                <MdViewer key={cv?._id} source={cv?.cv} />
+          {accessToken && (
+            <ReactMde
+              selectedTab={selectedTab}
+              onTabChange={setSelectedTab}
+              onChange={onSkillsInputChange}
+              value={skills}
+              generateMarkdownPreview={async (markdown) => {
+                const html = makeEmojiHtml(markdown);
 
-                <div>
-                  {moment(cv.createAt || new Date())
-                    .format('MMM DD, YYYY')
-                    .toString()}
-                </div>
-              </div>
+                return html;
+              }}
+            />
+          )}
+
+          {accessToken && (
+            <div className='row flex-nowrap justify-content-center m-5'>
+              <button className='btn btn-primary btn-block col-6 m-2' onClick={() => updateCv()}>
+                <NavLink
+                  className='nav-link no-href'
+                  to={`/create-cv/${cv?._id}`}>
+                  Adauga CV
+                </NavLink>
+              </button>
+
+              <button className='btn btn-primary btn-block col-6 m-2' onClick={() => updateCv()}>
+                Salveaza CV
+              </button>
             </div>
-          ))}
+          )}
 
-          <div className='row flex-nowrap justify-content-center m-5'>
-            <button className='btn btn-primary btn-block col-6 m-2' onClick={() => updateCv()}>
-              <NavLink
-                className='nav-link no-href'
-                to={`/create-cv/${cv?._id}`}>
-                Adauga CV
-              </NavLink>
-            </button>
-
-            <button className='btn btn-primary btn-block col-6 m-2' onClick={() => updateCv()}>
-              Salveaza CV
-            </button>
-          </div>
+          {!accessToken && (
+            <Questionnaire />
+          )}
 
         </div>
       )}

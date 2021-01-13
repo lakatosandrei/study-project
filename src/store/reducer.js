@@ -9,6 +9,8 @@ import register from 'pages/Register/reducer';
 import postReducer from 'pages/Post/reducer';
 import jobReducer from 'pages/Job/reducer';
 import cvReducer from 'pages/Cv/reducer';
+import { UPDATE_PARTICIPANT } from 'pages/Home/action';
+import studyReducer from 'pages/Study/reducer';
 import { UPDATE_TOKEN, UPDATE_LOADING, UPDATE_THEME, GET_ME } from './action';
 
 const initialState: GlobalStateType = {
@@ -21,6 +23,13 @@ const initialState: GlobalStateType = {
 
 const global = (state: any = initialState, action: ActionType) => {
   switch (action.type) {
+    case UPDATE_PARTICIPANT.SUCCESS: {
+      const { participant } = action.payload;
+
+      localStorage.setItem('participant', JSON.stringify(participant));
+
+      return { ...state, participant };
+    }
     case UPDATE_TOKEN: {
       let s = {
         ...state,
@@ -59,7 +68,8 @@ const createReducers = (history: History) =>
     register,
     cvReducer,
     postReducer,
-    jobReducer
+    jobReducer,
+    studyReducer
   });
 
 export default createReducers;

@@ -5,6 +5,7 @@ import Job from 'pages/Job';
 import Home from 'pages/Home';
 import { getPostsAction } from 'pages/Post/action';
 import { getJobsAction } from 'pages/Job/action';
+import { getStudyAction } from 'pages/Study/action';
 import PostDetail from 'pages/Post/PostDetail';
 import {
   getPostDetailAction,
@@ -19,11 +20,13 @@ import CreateJob from 'pages/Job/CreateJob';
 import JobDetail from 'pages/Job/JobDetail';
 import Introduce from 'pages/Introduce';
 import Projects from 'pages/Introduce/Projects';
+import Study from 'pages/Study';
 import Contact from 'pages/Contact';
 import NotFound from 'pages/NotFound';
-import App from './client/app';
 import CvDetail from 'pages/Cv/CvDetail';
 import { getCvDetailAction } from 'pages/Cv/CvDetail/action';
+
+import App from './client/app';
 
 export default [
   {
@@ -34,6 +37,13 @@ export default [
         exact: true,
         component: Home,
         title: 'Home'
+      },
+      {
+        path: '/study',
+        exact: true,
+        component: Study,
+        title: 'Study',
+        loadData: ({ _params }) => [getStudyAction()],
       },
       {
         path: '/jobs',

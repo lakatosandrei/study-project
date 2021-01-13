@@ -51,6 +51,10 @@ app.use(
     /^(?!.*^\/api\/auth\/logout)(\/api\/auth)/,
     /^(?!.*^\/api\/post\/create-post)(\/api\/post)/,
     /^(?!.*^\/api\/comment\/post-comment)(\/api\/comment)/,
+    /\/api\/study/,
+    /\/api\/job/,
+    /\/api\/cv/,
+    /\/api\/participants/,
   ]),
 );
 

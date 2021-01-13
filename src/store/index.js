@@ -17,10 +17,19 @@ const configureStore = ({ initialState, url }: ConfigureStoreType) => {
   const middlewares = [routerMiddleware(history), thunk];
 
   const enhancers = composeWithDevTools(applyMiddleware(...middlewares));
+  const initialStoreValue = initialState || {};
+
+  if (!isServer && initialStoreValue.global) {
+    const participant = localStorage.getItem('participant');
+
+    if (participant) {
+      initialStoreValue.global.participant = JSON.parse(participant);
+    }
+  }
 
   const store = createStore(
     createReducers(history),
-    initialState || {},
+    initialStoreValue,
     enhancers,
   );
 

@@ -106,8 +106,8 @@ const Child = ({
                         <li className='nav-item'>
                           <NavLink
                             className='nav-link sidebar__item'
-                            to='/profile'>
-                            {user?.name}
+                            to='/jobs'>
+                            Post-uri
                           </NavLink>
                         </li>
 

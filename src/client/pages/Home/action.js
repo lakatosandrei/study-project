@@ -1,18 +1,18 @@
 import { toast } from 'react-toastify';
 import { actionGenerator } from 'utils';
 import { requestAction } from 'utils/request';
-import { updateTokenAction } from 'store/action';
 
-export const LOGIN_ACTION = actionGenerator('@@LOGIN_ACTION');
-export const loginAction = (data) => (dispatch) =>
+export const UPDATE_PARTICIPANT = actionGenerator('@@UPDATE_PARTICIPANT');
+
+export const updateParticipant = (participant) => (dispatch) =>
   dispatch(
     requestAction({
-      url: '/auth/login',
-      label: LOGIN_ACTION.NAME,
+      url: '/participants',
+      label: UPDATE_PARTICIPANT.NAME,
       method: 'POST',
-      data,
-      onSuccess: ({ data: res }) => {
-        dispatch(updateTokenAction({ ...res }));
+      data: { participant },
+      onSuccess: ({ data: newData }) => {
+        dispatch({ type: UPDATE_PARTICIPANT.SUCCESS, payload: newData });
       },
       onError: ({ error }) => {
         toast.error(error.message);
@@ -20,19 +20,6 @@ export const loginAction = (data) => (dispatch) =>
     }),
   );
 
-export const JOIN_ACTION = actionGenerator('@@JOIN_ACTION');
-export const joinAction = (data) => (dispatch) =>
-  dispatch(
-    requestAction({
-      url: '/auth/login',
-      label: LOGIN_ACTION.NAME,
-      method: 'POST',
-      data,
-      onSuccess: ({ data: res }) => {
-        dispatch(updateTokenAction({ ...res }));
-      },
-      onError: ({ error }) => {
-        toast.error(error.message);
-      },
-    }),
-  );
+export const mockJoin = (data) => (dispatch) => {
+  dispatch({ type: UPDATE_PARTICIPANT.SUCCESS, payload: data })
+};

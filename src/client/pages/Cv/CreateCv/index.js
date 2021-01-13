@@ -101,6 +101,17 @@ const CreateCv = ({
     return <Redirect to='/' />;
   }
 
+  const options = [{
+    value: 'unmarried',
+    label: 'Necasatorit',
+  }, {
+    value: 'married',
+    label: 'Casatorit',
+  }].map(opt => gender === 'male' ? opt : {
+    ...opt,
+    label: `${opt.label}a`,
+  });
+
   return (
     <Layout title={title} needLogin className='create__cv__container'>
 
@@ -111,7 +122,7 @@ const CreateCv = ({
         <input
           id="profilePicture"
           type="file"
-          inputProps={{ accept: 'image/*' }}
+          accept='image/*'
           label="Poza de profil"
           name="profilePicture"
           onChange={e => handlePictureUpload(e)}
@@ -158,8 +169,9 @@ const CreateCv = ({
         <label htmlFor="maritalStatus">Statut marital:</label>
 
         <select name="maritalStatus" id="maritalStatus" value={maritalStatus} onChange={onMaritalStatusCvChange}>
-          <option value="unmarried">Necasatorita</option>
-          <option value="married">Casatorita</option>
+          {options.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
         </select>
       </div>
 
